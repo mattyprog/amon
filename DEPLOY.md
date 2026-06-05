@@ -37,17 +37,19 @@ git push -u origin main
 3. Annota due valori (servono dopo, su Vercel):
    - **Database URL** → `libsql://....turso.io` = `TURSO_DATABASE_URL`
    - **Auth Token** (crea un token) = `TURSO_AUTH_TOKEN`
-4. **Crea le tabelle**: apri la console SQL del database su Turso e incolla il
-   contenuto del file di migrazione che trovi nel progetto:
+4. **Crea le tabelle**: apri la console SQL del database su Turso e incolla, in
+   ordine cronologico, il contenuto di OGNI file di migrazione che trovi in:
 
    ```
    prisma/migrations/<data>_init/migration.sql
+   prisma/migrations/<data>_settings_users_services/migration.sql
    ```
 
-   Esegui: crea le tabelle `Appointment` e `Block`. Fatto una sola volta.
+   Creano le tabelle (appuntamenti, blocchi, utenti, servizi, orari,
+   impostazioni). Fatto una sola volta.
 
-> In alternativa, con la Turso CLI:
-> `turso db shell NOME-DB < prisma/migrations/<data>_init/migration.sql`
+> In alternativa, con la Turso CLI, lancia per ogni file in ordine:
+> `turso db shell NOME-DB < prisma/migrations/.../migration.sql`
 
 ---
 
@@ -75,9 +77,21 @@ git push -u origin main
    `https://amon.vercel.app`.
 
    - Sito clienti: `https://amon.vercel.app`
-   - Area barbiere: `https://amon.vercel.app/admin`
+   - App barbiere: `https://amon.vercel.app/admin`
 
 > Ad ogni `git push` su `main`, Vercel ripubblica automaticamente.
+
+### Primo accesso all'app barbiere
+
+Al primo login il sistema crea automaticamente l'utente titolare:
+
+- **Nome utente:** `amon`
+- **Password:** quella che hai messo in `ADMIN_PASSWORD`
+
+Dopo l'accesso vai in **Impostazioni → Accessi** per cambiare la password e
+creare gli account dei collaboratori (ognuno con il proprio nome utente).
+In **Impostazioni** puoi anche gestire servizi, prezzi, orari e dati del
+negozio: le modifiche si riflettono subito sul sito dei clienti.
 
 ---
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/actions/auth";
 import { cancelAppointment, removeBlock } from "@/actions/admin";
-import { formatPrice, shop } from "@/lib/shop";
+import { formatPrice, getShop } from "@/lib/shop";
 import {
   todayInShop,
   addDays,
@@ -35,6 +35,7 @@ export default async function AdminPage({
   const grid = monthGrid(date);
   const gridStart = grid[0];
   const gridEnd = grid[grid.length - 1];
+  const shop = await getShop();
 
   const [appointments, blocks, monthRows] = await Promise.all([
     prisma.appointment.findMany({

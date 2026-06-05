@@ -27,26 +27,34 @@ npm run dev                 # http://localhost:3000
   calcolati da: orari di apertura − durata del servizio − prenotazioni già
   prese − blocchi del barbiere − orari già passati. La conferma è immediata.
 
-### Area barbiere (riservata)
-- **Login** (`/admin/login`): protetto da password.
-- **Dashboard** (`/admin`): agenda giorno per giorno con statistiche (numero
-  appuntamenti, incasso previsto). Da qui il barbiere può:
-  - vedere tutti gli appuntamenti con nome, telefono, servizio e note;
-  - **annullare** una prenotazione (libera subito lo slot);
-  - **bloccare** fasce orarie (pausa, ferie, impegni) così non risultano
-    prenotabili.
+### App barbiere (riservata, installabile come PWA)
+È un'app gestionale separata, installabile sul telefono (icona "Amon Agenda"),
+collegata allo stesso database del sito.
 
-L'accesso è protetto a due livelli: il file `proxy.ts` blocca ogni rotta
-`/admin` senza sessione valida, e ogni azione sul database ri-verifica la
-sessione (cookie firmato con HMAC-SHA256).
+- **Login** (`/admin/login`): nome utente + password, **multi-utente**.
+- **Agenda** (`/admin`): calendario mensile con badge degli appuntamenti per
+  giorno; toccando un giorno si apre l'agenda con statistiche (numero
+  appuntamenti, incasso previsto). Da qui il barbiere può:
+  - vedere gli appuntamenti con nome, telefono, servizio e note;
+  - **annullare** una prenotazione (libera subito lo slot);
+  - **bloccare** fasce orarie (pausa, ferie, impegni).
+- **Impostazioni** (`/admin/impostazioni`):
+  - **Servizi e prezzi**, **Orari di apertura**, **Dati negozio** → si
+    riflettono subito sul sito dei clienti;
+  - **Accessi**: cambio password e gestione dei collaboratori (account
+    separati; "titolare" può creare/revocare utenti).
+
+L'accesso è protetto a due livelli: `proxy.ts` blocca ogni rotta `/admin`
+senza sessione valida, e ogni azione sul database ri-verifica la sessione
+(cookie firmato HMAC-SHA256). Le password sono salvate con hash scrypt.
+
+Al primo avvio viene creato l'utente titolare `amon` con password =
+`ADMIN_PASSWORD`, e i valori di default di servizi/orari/negozio.
 
 ## Personalizzazione
 
-Quasi tutto si configura da **`lib/shop.ts`**:
-- dati del negozio (nome, indirizzo, telefono, email);
-- **servizi** (nome, descrizione, durata, prezzo);
-- **orari di apertura** per giorno della settimana;
-- finestra di prenotazione e passo degli slot.
+Tutto si gestisce **dall'app** in *Impostazioni* (servizi, orari, dati negozio,
+accessi). I valori di default iniziali sono in **`lib/config.ts`**.
 
 ## Struttura
 

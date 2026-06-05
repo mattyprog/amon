@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getService, shop } from "@/lib/shop";
+import { getServiceById, BOOKING_HORIZON_DAYS } from "@/lib/shop";
 import { getAvailableSlots, getBusyIntervals, overlaps } from "@/lib/availability";
 import {
   todayInShop,
@@ -12,11 +12,11 @@ import {
 
 /** Orari disponibili per un servizio in un dato giorno (chiamata dal form). */
 export async function fetchSlots(serviceId: string, date: string): Promise<number[]> {
-  const service = getService(serviceId);
+  const service = await getServiceById(serviceId);
   if (!service) return [];
   // Non permettere date fuori dalla finestra di prenotazione.
   const today = todayInShop();
-  const last = addDays(today, shop.bookingHorizonDays);
+  const last = addDays(today, BOOKING_HORIZON_DAYS);
   if (date < today || date > last) return [];
   return getAvailableSlots(date, service.durationMin);
 }
@@ -72,12 +72,12 @@ export async function createBooking(formData: FormData): Promise<BookingResult> 
   }
 
   const data = parsed.data;
-  const service = getService(data.serviceId);
+  const service = await getServiceById(data.serviceId);
   if (!service) return { ok: false, error: "Servizio non valido" };
 
   // Validazioni temporali.
   const today = todayInShop();
-  const last = addDays(today, shop.bookingHorizonDays);
+  const last = addDays(today, BOOKING_HORIZON_DAYS);
   if (data.date < today || data.date > last) {
     return { ok: false, error: "Data fuori dal periodo prenotabile" };
   }

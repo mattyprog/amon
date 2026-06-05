@@ -1,28 +1,24 @@
-// Autenticazione del barbiere — leggera ma sicura.
-//
-// La sessione è un cookie firmato con HMAC-SHA256 tramite la Web Crypto API,
-// disponibile sia nel runtime edge (il file `proxy.ts`) sia in Node (le Server
-// Action). Nessuna dipendenza esterna. Il cookie contiene solo un ruolo e una
-// scadenza: non essendo decifrabile né falsificabile senza il segreto, non
-// serve uno store di sessioni lato server.
+// Sessione del barbiere — firmata con HMAC-SHA256 via Web Crypto, così la
+// stessa verifica funziona nel runtime edge (proxy.ts) e in Node (le Server
+// Action). Il cookie contiene id utente, ruolo e scadenza: firmato, non è
+// falsificabile senza il segreto. L'hashing delle password è in lib/password.ts
+// (runtime Node) per non trascinare node:crypto nel bundle edge.
 
-const ROLE = "barber";
 const SESSION_TTL_SECONDS = 60 * 60 * 12; // 12 ore
 export const SESSION_COOKIE = "amon_session";
 
-type SessionPayload = { role: string; exp: number };
+export type Session = { userId: string; role: string; exp: number };
 
 function getSecret(): string {
   const secret = process.env.AUTH_SECRET;
   if (!secret || secret.length < 16) {
     throw new Error(
-      "AUTH_SECRET mancante o troppo corto: impostane uno di almeno 16 caratteri in .env.local",
+      "AUTH_SECRET mancante o troppo corto: impostane uno di almeno 16 caratteri.",
     );
   }
   return secret;
 }
 
-// --- Codifica base64url (compatibile edge + node) ---
 function toBase64Url(bytes: Uint8Array): string {
   let bin = "";
   for (const b of bytes) bin += String.fromCharCode(b);
@@ -49,7 +45,6 @@ async function hmac(data: string): Promise<Uint8Array> {
   return new Uint8Array(sig);
 }
 
-/** Confronto a tempo costante per evitare timing attack. */
 function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
@@ -57,10 +52,14 @@ function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-/** Crea un token di sessione firmato, valido per le prossime 12 ore. */
-export async function createSessionToken(): Promise<string> {
-  const payload: SessionPayload = {
-    role: ROLE,
+/** Crea un token di sessione firmato per un utente, valido 12 ore. */
+export async function createSessionToken(
+  userId: string,
+  role: string,
+): Promise<string> {
+  const payload: Session = {
+    userId,
+    role,
     exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
   };
   const body = toBase64Url(new TextEncoder().encode(JSON.stringify(payload)));
@@ -68,30 +67,26 @@ export async function createSessionToken(): Promise<string> {
   return `${body}.${sig}`;
 }
 
-/** Verifica un token; restituisce true solo se firma e scadenza sono valide. */
-export async function verifySessionToken(token: string | undefined): Promise<boolean> {
-  if (!token) return false;
+/** Verifica un token; restituisce la sessione se valida, altrimenti null. */
+export async function verifySessionToken(
+  token: string | undefined,
+): Promise<Session | null> {
+  if (!token) return null;
   const [body, sig] = token.split(".");
-  if (!body || !sig) return false;
+  if (!body || !sig) return null;
   try {
     const expected = toBase64Url(await hmac(body));
-    if (!timingSafeEqual(sig, expected)) return false;
+    if (!timingSafeEqual(sig, expected)) return null;
     const payload = JSON.parse(
       new TextDecoder().decode(fromBase64Url(body)),
-    ) as SessionPayload;
-    return payload.role === ROLE && payload.exp > Math.floor(Date.now() / 1000);
+    ) as Session;
+    if (!payload.userId || payload.exp <= Math.floor(Date.now() / 1000)) {
+      return null;
+    }
+    return payload;
   } catch {
-    return false;
+    return null;
   }
-}
-
-/** Verifica la password del barbiere a tempo costante. */
-export function checkPassword(input: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) {
-    throw new Error("ADMIN_PASSWORD non impostata in .env.local");
-  }
-  return timingSafeEqual(input, expected);
 }
 
 export const SESSION_MAX_AGE = SESSION_TTL_SECONDS;

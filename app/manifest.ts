@@ -1,18 +1,17 @@
 import type { MetadataRoute } from "next";
-import { shop } from "@/lib/shop";
+import { SHOP_DEFAULTS as shop } from "@/lib/shop";
 
-// Web App Manifest: rende il sito installabile come app sul telefono.
-// start_url punta all'agenda, così aprendo l'icona il barbiere entra
-// direttamente nel calendario delle prenotazioni.
+// Manifest del SITO CLIENTI (Amon Barberia). Rende installabile la parte
+// pubblica, che si apre sulla home. L'AREA BARBIERE ha un manifest separato
+// (public/admin.webmanifest) così risulta un'app distinta sul telefono.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${shop.name} ${shop.tagline} — Agenda`,
+    name: `${shop.name} ${shop.tagline}`,
     short_name: shop.name,
-    description: "Gestione e calendario delle prenotazioni.",
-    start_url: "/admin",
+    description: "Prenota online taglio e barba da Amon.",
+    start_url: "/",
     scope: "/",
     display: "standalone",
-    orientation: "portrait",
     background_color: "#08080a",
     theme_color: "#08080a",
     lang: "it",

@@ -1,37 +1,36 @@
 import { prisma } from "./prisma";
-import { openingHours, shop, getService } from "./shop";
+import { SLOT_STEP_MIN, getOpeningHours } from "./shop";
 import { todayInShop, nowMinutesInShop, weekdayOf } from "./time";
 
 /** Un intervallo occupato [start, end) in minuti dalla mezzanotte. */
 export type Interval = { startMin: number; endMin: number };
 
-/** Due intervalli si sovrappongono? (estremi esclusi: 12:00–12:30 e 12:30–13:00 NON si toccano) */
+/** Due intervalli si sovrappongono? (estremi esclusi) */
 export function overlaps(a: Interval, b: Interval): boolean {
   return a.startMin < b.endMin && b.startMin < a.endMin;
 }
 
 /**
  * Calcola gli orari di inizio disponibili per un servizio in un dato giorno.
- * Funzione pura: riceve già la lista degli intervalli occupati, così è
- * facile da testare e non dipende dal database.
+ * Funzione pura: riceve già le fasce di apertura del giorno e gli intervalli
+ * occupati, così è facile da testare e non dipende dal database.
  */
 export function computeSlots(params: {
-  date: string;
+  segments: Array<[number, number]>;
   durationMin: number;
   busy: Interval[];
+  stepMin?: number;
   /** Minuti correnti se il giorno è oggi, altrimenti undefined (giorno futuro). */
   nowMin?: number;
 }): number[] {
-  const { date, durationMin, busy, nowMin } = params;
-  const segments = openingHours[weekdayOf(date)] ?? [];
+  const { segments, durationMin, busy, nowMin } = params;
+  const step = params.stepMin ?? SLOT_STEP_MIN;
   const slots: number[] = [];
 
   for (const [open, close] of segments) {
-    for (let start = open; start + durationMin <= close; start += shop.slotStepMin) {
+    for (let start = open; start + durationMin <= close; start += step) {
       const candidate: Interval = { startMin: start, endMin: start + durationMin };
-      // Scarta gli orari già passati se stiamo guardando oggi.
       if (nowMin !== undefined && start <= nowMin) continue;
-      // Scarta se si sovrappone a una prenotazione o a un blocco.
       if (busy.some((b) => overlaps(candidate, b))) continue;
       slots.push(start);
     }
@@ -59,7 +58,11 @@ export async function getAvailableSlots(
   date: string,
   durationMin: number,
 ): Promise<number[]> {
-  const busy = await getBusyIntervals(date);
+  const [hours, busy] = await Promise.all([
+    getOpeningHours(),
+    getBusyIntervals(date),
+  ]);
+  const segments = hours[weekdayOf(date)] ?? [];
   const nowMin = date === todayInShop() ? nowMinutesInShop() : undefined;
-  return computeSlots({ date, durationMin, busy, nowMin });
+  return computeSlots({ segments, durationMin, busy, nowMin });
 }

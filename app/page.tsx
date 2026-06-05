@@ -3,9 +3,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LogoMark } from "@/components/LogoMark";
 import {
-  shop,
-  services,
-  openingHours,
+  getShop,
+  getServices,
+  getOpeningHours,
   weekdayNames,
   formatPrice,
 } from "@/lib/shop";
@@ -18,7 +18,12 @@ function hoursLabel(segments: Array<[number, number]>): string {
     .join(" · ");
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [shop, services, openingHours] = await Promise.all([
+    getShop(),
+    getServices(),
+    getOpeningHours(),
+  ]);
   const weekOrder = [1, 2, 3, 4, 5, 6, 0];
 
   return (

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { fetchSlots, createBooking, type BookingResult } from "@/actions/booking";
-import { formatPrice, type Service } from "@/lib/shop";
+import { formatPrice, type Service } from "@/lib/config";
 import { minutesToHHMM, formatDateLabel } from "@/lib/time";
 
 export type DayOption = { date: string; label: string };

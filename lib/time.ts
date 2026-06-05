@@ -1,4 +1,4 @@
-import { shop } from "./shop";
+import { TIMEZONE } from "./config";
 
 // Utility per lavorare con date e orari nel fuso orario del negozio,
 // indipendentemente da come è configurato il server.
@@ -6,7 +6,7 @@ import { shop } from "./shop";
 /** Restituisce la data odierna nel negozio come "YYYY-MM-DD". */
 export function todayInShop(): string {
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone: shop.timezone,
+    timeZone: TIMEZONE,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -16,7 +16,7 @@ export function todayInShop(): string {
 /** Minuti dalla mezzanotte dell'ora corrente nel negozio (0–1439). */
 export function nowMinutesInShop(): number {
   const parts = new Intl.DateTimeFormat("it-IT", {
-    timeZone: shop.timezone,
+    timeZone: TIMEZONE,
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,

@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { shop } from "@/lib/shop";
+import { getShop } from "@/lib/shop";
 import { LogoMark } from "./LogoMark";
 
-/** Logo di Amon: marchio esagonale + nome insegna. */
-export function Logo({ href = "/" }: { href?: string }) {
+/** Logo di Amon: marchio esagonale + nome insegna (dal DB). */
+export async function Logo({ href = "/" }: { href?: string }) {
+  const shop = await getShop();
   return (
     <Link href={href} className="group inline-flex items-center gap-3">
       <LogoMark className="h-10 w-10 text-ink transition-transform group-hover:scale-105" />

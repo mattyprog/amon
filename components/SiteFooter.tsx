@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { shop, openingHours, weekdayNames } from "@/lib/shop";
+import { getShop, getOpeningHours, weekdayNames } from "@/lib/shop";
 import { minutesToHHMM } from "@/lib/time";
 import { InstagramIcon } from "./InstagramIcon";
 
@@ -11,8 +11,8 @@ function hoursLabel(segments: Array<[number, number]>): string {
 }
 
 /** Footer con contatti e orari sintetici. */
-export function SiteFooter() {
-  // Ordine settimana: lunedì → domenica.
+export async function SiteFooter() {
+  const [shop, hours] = await Promise.all([getShop(), getOpeningHours()]);
   const order = [1, 2, 3, 4, 5, 6, 0];
   return (
     <footer className="mt-auto border-t border-line/70 bg-surface">
@@ -28,7 +28,7 @@ export function SiteFooter() {
             {order.map((d) => (
               <li key={d} className="flex justify-between gap-4">
                 <span className="text-ink/80">{weekdayNames[d]}</span>
-                <span>{hoursLabel(openingHours[d] ?? [])}</span>
+                <span>{hoursLabel(hours[d] ?? [])}</span>
               </li>
             ))}
           </ul>
@@ -48,17 +48,19 @@ export function SiteFooter() {
                 {shop.email}
               </a>
             </li>
-            <li>
-              <a
-                href={shop.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 hover:text-ink"
-              >
-                <InstagramIcon className="h-4 w-4" />
-                {shop.instagramHandle}
-              </a>
-            </li>
+            {shop.instagram && (
+              <li>
+                <a
+                  href={shop.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 hover:text-ink"
+                >
+                  <InstagramIcon className="h-4 w-4" />
+                  {shop.instagramHandle}
+                </a>
+              </li>
+            )}
           </ul>
           <Link
             href="/admin"
@@ -69,7 +71,8 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-line/70 py-4 text-center text-xs text-muted/60">
-        © {new Date().getFullYear()} {shop.name} Barbershop · Tutti i diritti riservati
+        © {new Date().getFullYear()} {shop.name} {shop.tagline} · Tutti i diritti
+        riservati
       </div>
     </footer>
   );

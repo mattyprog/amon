@@ -2,15 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { services, shop } from "@/lib/shop";
+import {
+  getServices,
+  getShop,
+  getOpeningHours,
+  BOOKING_HORIZON_DAYS,
+} from "@/lib/shop";
 import { upcomingDates, weekdayOf, formatDateShort } from "@/lib/time";
-import { openingHours } from "@/lib/shop";
 import { BookingForm, type DayOption } from "./BookingForm";
 
-export const metadata: Metadata = {
-  title: "Prenota",
-  description: `Prenota online il tuo appuntamento da ${shop.name}.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const shop = await getShop();
+  return {
+    title: "Prenota",
+    description: `Prenota online il tuo appuntamento da ${shop.name}.`,
+  };
+}
 
 export default async function BookingPage({
   searchParams,
@@ -18,10 +25,14 @@ export default async function BookingPage({
   searchParams: Promise<{ servizio?: string }>;
 }) {
   const { servizio } = await searchParams;
+  const [services, openingHours] = await Promise.all([
+    getServices(),
+    getOpeningHours(),
+  ]);
 
   // Calcoliamo lato server l'elenco dei giorni prenotabili (saltando i giorni
   // di chiusura) così il client e il server vedono lo stesso "oggi".
-  const days: DayOption[] = upcomingDates(shop.bookingHorizonDays)
+  const days: DayOption[] = upcomingDates(BOOKING_HORIZON_DAYS)
     .filter((date) => (openingHours[weekdayOf(date)] ?? []).length > 0)
     .map((date) => ({ date, label: formatDateShort(date) }));
 

@@ -44,3 +44,42 @@ model Block {
 
   @@index([date])
 }
+
+/// Utente dell'app gestionale: il titolare e i collaboratori.
+/// Ogni persona ha le proprie credenziali (account separati).
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("staff") // owner | staff
+  createdAt    DateTime @default(now())
+}
+
+/// Servizio offerto (gestito dal barbiere, mostrato e prenotabile sul sito).
+model Service {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  durationMin Int
+  priceCents  Int
+  active      Boolean @default(true)
+  sort        Int     @default(0)
+}
+
+/// Un intervallo di apertura per un giorno della settimana (0=dom … 6=sab).
+/// Più righe sullo stesso giorno = più fasce (es. mattina e pomeriggio).
+model OpeningHour {
+  id       String @id @default(cuid())
+  weekday  Int
+  startMin Int
+  endMin   Int
+
+  @@index([weekday])
+}
+
+/// Impostazioni generiche chiave/valore (dati negozio, passo slot, ecc.).
+model Setting {
+  key   String @id
+  value String
+}

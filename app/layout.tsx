@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Oswald } from "next/font/google";
-import { shop } from "@/lib/shop";
+import { getShop } from "@/lib/shop";
 import "./globals.css";
 
 const inter = Inter({
@@ -16,15 +16,17 @@ const oswald = Oswald({
   display: "swap",
 });
 
-const city = shop.address.split(",").slice(-1)[0].trim();
-
-export const metadata: Metadata = {
-  title: {
-    default: `${shop.name} — ${shop.tagline}`,
-    template: `%s · ${shop.name}`,
-  },
-  description: `${shop.name} ${shop.tagline} a ${city}. ${shop.claim} Prenota online il tuo taglio in pochi secondi.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const shop = await getShop();
+  const city = shop.address.split(",").slice(-1)[0].trim();
+  return {
+    title: {
+      default: `${shop.name} — ${shop.tagline}`,
+      template: `%s · ${shop.name}`,
+    },
+    description: `${shop.name} ${shop.tagline} a ${city}. ${shop.claim} Prenota online il tuo taglio in pochi secondi.`,
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#08080a",

@@ -11,6 +11,22 @@ export function LoginForm() {
   return (
     <form action={formAction} className="mt-6 space-y-4">
       <div>
+        <label htmlFor="username" className="mb-1.5 block text-sm text-muted">
+          Nome utente
+        </label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          required
+          autoFocus
+          autoCapitalize="none"
+          autoComplete="username"
+          className="w-full rounded-md border border-line bg-bg px-3 py-2.5 text-ink focus:outline-2 focus:outline-gold"
+          placeholder="amon"
+        />
+      </div>
+      <div>
         <label htmlFor="password" className="mb-1.5 block text-sm text-muted">
           Password
         </label>
@@ -19,7 +35,6 @@ export function LoginForm() {
           name="password"
           type="password"
           required
-          autoFocus
           autoComplete="current-password"
           className="w-full rounded-md border border-line bg-bg px-3 py-2.5 text-ink focus:outline-2 focus:outline-gold"
           placeholder="••••••••"

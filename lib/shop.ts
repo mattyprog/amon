@@ -1,98 +1,67 @@
-// Configurazione del negozio. È l'unico punto da toccare per cambiare
-// servizi, orari di apertura, prezzi e dati di contatto di Amon.
+import { prisma } from "./prisma";
+import {
+  SHOP_DEFAULTS,
+  SHOP_FIELDS,
+  DEFAULT_SERVICES,
+  DEFAULT_HOURS,
+  type ShopInfo,
+  type Service,
+} from "./config";
 
-export const shop = {
-  name: "Amon",
-  tagline: "Barberia",
-  // Frase d'effetto in homepage
-  claim: "Taglio, barba e cura. Su misura per te.",
-  phone: "+39 351 000 0000",
-  email: "info@amonbarber.it",
-  address: "Via del Taglio 12, Milano",
-  instagram: "https://www.instagram.com/amon.barberia",
-  instagramHandle: "@amon.barberia",
-  // Fuso orario usato per calcolare \"oggi\" e gli slot disponibili.
-  timezone: "Europe/Rome",
-  // Quanti giorni in avanti si può prenotare.
-  bookingHorizonDays: 30,
-  // Passo della griglia di slot, in minuti (ogni quanto può iniziare un taglio).
-  slotStepMin: 15,
-} as const;
+// Lettori dal DATABASE della configurazione del negozio (con fallback ai
+// default se non ancora configurato). La parte pura — costanti, tipi, default,
+// formatPrice — è in lib/config.ts ed è ri-esportata qui sotto per comodità
+// dei componenti server.
+export * from "./config";
 
-export type Service = {
-  id: string;
-  name: string;
-  description: string;
-  durationMin: number;
-  priceCents: number;
-};
-
-// Listino servizi. La durata determina quanti slot occupa la prenotazione.
-export const services: Service[] = [
-  {
-    id: "taglio",
-    name: "Taglio",
-    description: "Taglio classico o moderno, lavaggio e styling.",
-    durationMin: 30,
-    priceCents: 2000,
-  },
-  {
-    id: "barba",
-    name: "Barba",
-    description: "Rifinitura e modellatura barba con panno caldo.",
-    durationMin: 20,
-    priceCents: 1500,
-  },
-  {
-    id: "taglio-barba",
-    name: "Taglio + Barba",
-    description: "Il pacchetto completo: taglio, barba e styling.",
-    durationMin: 45,
-    priceCents: 3000,
-  },
-  {
-    id: "ragazzo",
-    name: "Taglio Ragazzo",
-    description: "Taglio per under 12.",
-    durationMin: 20,
-    priceCents: 1500,
-  },
-];
-
-// Orari di apertura per giorno della settimana (0 = domenica … 6 = sabato).
-// Ogni giorno è una lista di intervalli aperti [inizioMin, fineMin] in minuti
-// dalla mezzanotte. Lista vuota = chiuso. La pausa pranzo è semplicemente
-// l'assenza di un intervallo che la copre.
-const H = (h: number, m = 0) => h * 60 + m;
-
-export const openingHours: Record<number, Array<[number, number]>> = {
-  0: [], // Domenica — chiuso
-  1: [], // Lunedì — chiuso
-  2: [[H(9), H(13)], [H(15), H(19)]], // Martedì
-  3: [[H(9), H(13)], [H(15), H(19)]], // Mercoledì
-  4: [[H(9), H(13)], [H(15), H(19)]], // Giovedì
-  5: [[H(9), H(13)], [H(15), H(20)]], // Venerdì
-  6: [[H(9), H(18)]], // Sabato (orario continuato)
-};
-
-export const weekdayNames = [
-  "Domenica",
-  "Lunedì",
-  "Martedì",
-  "Mercoledì",
-  "Giovedì",
-  "Venerdì",
-  "Sabato",
-];
-
-export function getService(id: string): Service | undefined {
-  return services.find((s) => s.id === id);
+/** Dati del negozio: i valori salvati sovrascrivono i default. */
+export async function getShop(): Promise<ShopInfo> {
+  const rows = await prisma.setting.findMany();
+  const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+  const out = { ...SHOP_DEFAULTS };
+  for (const f of SHOP_FIELDS) {
+    if (map[f.key] !== undefined && map[f.key] !== "") {
+      out[f.key] = map[f.key];
+    }
+  }
+  return out;
 }
 
-export function formatPrice(cents: number): string {
-  return new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
-  }).format(cents / 100);
+/** Servizi attivi ordinati. Se il DB è vuoto, usa i default. */
+export async function getServices(includeInactive = false): Promise<Service[]> {
+  const rows = await prisma.service.findMany({
+    where: includeInactive ? undefined : { active: true },
+    orderBy: [{ sort: "asc" }, { priceCents: "asc" }],
+  });
+  if (rows.length === 0) {
+    return DEFAULT_SERVICES.map((s, i) => ({ id: `default-${i}`, ...s }));
+  }
+  return rows.map((r) => ({
+    id: r.id,
+    name: r.name,
+    description: r.description ?? "",
+    durationMin: r.durationMin,
+    priceCents: r.priceCents,
+  }));
+}
+
+/** Singolo servizio per id. */
+export async function getServiceById(id: string): Promise<Service | null> {
+  const all = await getServices(true);
+  return all.find((s) => s.id === id) ?? null;
+}
+
+/** Orari di apertura come mappa giorno → fasce. Default se DB vuoto. */
+export async function getOpeningHours(): Promise<
+  Record<number, Array<[number, number]>>
+> {
+  const rows = await prisma.openingHour.findMany({
+    orderBy: [{ weekday: "asc" }, { startMin: "asc" }],
+  });
+  if (rows.length === 0) return DEFAULT_HOURS;
+  const map: Record<number, Array<[number, number]>> = {
+    0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [],
+  };
+  for (const r of rows) map[r.weekday].push([r.startMin, r.endMin]);
+  return map;
 }
