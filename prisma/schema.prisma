@@ -1,0 +1,46 @@
+// Schema del database di Amon Barbershop.
+// Documentazione: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// Una prenotazione fatta da un cliente.
+/// L'orario è memorizzato come data locale (YYYY-MM-DD) + minuti dalla
+/// mezzanotte, così il calcolo della disponibilità è pura aritmetica e
+/// non dipende dal fuso orario del server.
+model Appointment {
+  id            String   @id @default(cuid())
+  serviceId     String
+  serviceName   String
+  durationMin   Int
+  priceCents    Int
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  notes         String?
+  date          String // YYYY-MM-DD (ora locale negozio)
+  startMin      Int // minuti dalla mezzanotte
+  endMin        Int
+  status        String   @default("confirmed") // confirmed | cancelled
+  createdAt     DateTime @default(now())
+
+  @@index([date, status])
+}
+
+/// Un blocco di indisponibilità inserito dal barbiere (ferie, pausa, impegno).
+model Block {
+  id        String   @id @default(cuid())
+  date      String // YYYY-MM-DD
+  startMin  Int
+  endMin    Int
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([date])
+}

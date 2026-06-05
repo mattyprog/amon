@@ -1,65 +1,179 @@
-import Image from "next/image";
+import Link from "next/link";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { LogoMark } from "@/components/LogoMark";
+import {
+  shop,
+  services,
+  openingHours,
+  weekdayNames,
+  formatPrice,
+} from "@/lib/shop";
+import { minutesToHHMM } from "@/lib/time";
 
-export default function Home() {
+function hoursLabel(segments: Array<[number, number]>): string {
+  if (segments.length === 0) return "Chiuso";
+  return segments
+    .map(([a, b]) => `${minutesToHHMM(a)}–${minutesToHHMM(b)}`)
+    .join(" · ");
+}
+
+export default function HomePage() {
+  const weekOrder = [1, 2, 3, 4, 5, 6, 0];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <SiteHeader />
+
+      {/* HERO */}
+      <section className="relative overflow-hidden">
+        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:py-28 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <p className="signage mb-4 text-sm text-gold">
+              {shop.tagline} · {shop.address.split(",").slice(-1)[0].trim()}
+            </p>
+            <h1 className="font-display text-5xl leading-[0.95] text-ink sm:text-7xl">
+              Il tuo stile,
+              <br />
+              <span className="text-gold">tagliato a regola d&apos;arte.</span>
+            </h1>
+            <p className="mt-6 max-w-md text-lg text-muted">{shop.claim}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Link
+                href="/prenota"
+                className="rounded-sm bg-gold px-7 py-3 font-semibold text-bg transition-colors hover:bg-gold-soft"
+              >
+                Prenota ora
+              </Link>
+              <a
+                href={`tel:${shop.phone.replace(/\s/g, "")}`}
+                className="rounded-sm border border-line px-7 py-3 font-semibold text-ink transition-colors hover:border-gold hover:text-gold"
+              >
+                Chiama {shop.phone}
+              </a>
+            </div>
+          </div>
+
+          {/* Marchio su disco nero, come l'avatar Instagram */}
+          <div className="relative mx-auto aspect-square w-full max-w-sm">
+            <div className="absolute inset-0 rounded-full border border-line" />
+            <div className="absolute inset-4 grid place-items-center rounded-full bg-black shadow-[0_0_60px_-10px_rgba(255,255,255,0.15)]">
+              <div className="text-center">
+                <LogoMark className="mx-auto h-40 w-40 text-ink sm:h-48 sm:w-48" />
+                <div className="mt-3 text-[11px] uppercase tracking-[0.45em] text-muted">
+                  Est. 2026
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* SERVIZI */}
+      <section id="servizi" className="border-t border-line/70 bg-surface/40">
+        <div className="mx-auto max-w-6xl px-5 py-20">
+          <header className="mb-12 flex items-end justify-between gap-6">
+            <div>
+              <p className="signage text-sm text-gold">Listino</p>
+              <h2 className="font-display text-4xl text-ink">I nostri servizi</h2>
+            </div>
+            <Link
+              href="/prenota"
+              className="hidden text-sm text-gold underline-offset-4 hover:underline sm:inline"
+            >
+              Prenota un servizio →
+            </Link>
+          </header>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            {services.map((s) => (
+              <Link
+                key={s.id}
+                href={`/prenota?servizio=${s.id}`}
+                className="group flex items-start justify-between gap-6 rounded-md border border-line bg-surface p-6 transition-colors hover:border-gold/60"
+              >
+                <div>
+                  <h3 className="signage text-xl text-ink group-hover:text-gold">
+                    {s.name}
+                  </h3>
+                  <p className="mt-2 text-sm text-muted">{s.description}</p>
+                  <p className="mt-3 text-xs uppercase tracking-wide text-muted/70">
+                    Durata {s.durationMin} min
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <div className="font-display text-2xl text-gold">
+                    {formatPrice(s.priceCents)}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* ORARI + DOVE */}
+      <section className="mx-auto grid max-w-6xl gap-10 px-5 py-20 lg:grid-cols-2">
+        <div id="orari">
+          <p className="signage text-sm text-gold">Quando</p>
+          <h2 className="font-display text-4xl text-ink">Orari di apertura</h2>
+          <ul className="mt-6 divide-y divide-line/60 rounded-md border border-line bg-surface">
+            {weekOrder.map((d) => {
+              const closed = (openingHours[d] ?? []).length === 0;
+              return (
+                <li
+                  key={d}
+                  className="flex items-center justify-between gap-4 px-5 py-3"
+                >
+                  <span className="text-ink/90">{weekdayNames[d]}</span>
+                  <span className={closed ? "text-muted/60" : "text-gold"}>
+                    {hoursLabel(openingHours[d] ?? [])}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div id="dove">
+          <p className="signage text-sm text-gold">Dove</p>
+          <h2 className="font-display text-4xl text-ink">Vieni a trovarci</h2>
+          <div className="mt-6 rounded-md border border-line bg-surface p-6">
+            <p className="text-lg text-ink">{shop.address}</p>
+            <p className="mt-2 text-muted">
+              Telefono:{" "}
+              <a
+                href={`tel:${shop.phone.replace(/\s/g, "")}`}
+                className="text-gold hover:underline"
+              >
+                {shop.phone}
+              </a>
+            </p>
+            <a
+              href={`https://maps.google.com/?q=${encodeURIComponent(shop.address)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-block rounded-sm border border-line px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-gold hover:text-gold"
+            >
+              Apri in mappa
+            </a>
+          </div>
+          <div className="mt-5 rounded-md border border-gold/30 bg-gold/5 p-6">
+            <p className="text-ink">
+              Pronto per un nuovo look? Scegli servizio, giorno e orario in meno di un
+              minuto.
+            </p>
+            <Link
+              href="/prenota"
+              className="mt-4 inline-block rounded-sm bg-gold px-6 py-2.5 font-semibold text-bg transition-colors hover:bg-gold-soft"
+            >
+              Prenota online
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <SiteFooter />
+    </>
   );
 }

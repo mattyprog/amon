@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Amon Barbershop
 
-## Getting Started
+Sito web del barbiere **Amon**: i clienti prenotano online in base alla
+disponibilità reale, il barbiere gestisce e supervisiona gli appuntamenti da
+un'area riservata.
 
-First, run the development server:
+Costruito con **Next.js 16** (App Router, Turbopack), **Tailwind CSS v4**,
+**Prisma 7 + SQLite** e validazione con **Zod**.
+
+## Avvio rapido
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npx prisma migrate dev      # crea/aggiorna il database SQLite
+npm run dev                 # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> Le variabili d'ambiente sono già pronte in `.env.local`. Prima di andare
+> online **cambia `ADMIN_PASSWORD`** e rigenera `AUTH_SECRET`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Come funziona
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Lato cliente
+- **Home** (`/`): presentazione, listino servizi, orari, dove siamo.
+- **Prenotazione** (`/prenota`): il cliente sceglie servizio → giorno → orario
+  → inserisce i dati. Gli orari mostrati sono **solo quelli realmente liberi**,
+  calcolati da: orari di apertura − durata del servizio − prenotazioni già
+  prese − blocchi del barbiere − orari già passati. La conferma è immediata.
 
-## Learn More
+### Area barbiere (riservata)
+- **Login** (`/admin/login`): protetto da password.
+- **Dashboard** (`/admin`): agenda giorno per giorno con statistiche (numero
+  appuntamenti, incasso previsto). Da qui il barbiere può:
+  - vedere tutti gli appuntamenti con nome, telefono, servizio e note;
+  - **annullare** una prenotazione (libera subito lo slot);
+  - **bloccare** fasce orarie (pausa, ferie, impegni) così non risultano
+    prenotabili.
 
-To learn more about Next.js, take a look at the following resources:
+L'accesso è protetto a due livelli: il file `proxy.ts` blocca ogni rotta
+`/admin` senza sessione valida, e ogni azione sul database ri-verifica la
+sessione (cookie firmato con HMAC-SHA256).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Personalizzazione
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Quasi tutto si configura da **`lib/shop.ts`**:
+- dati del negozio (nome, indirizzo, telefono, email);
+- **servizi** (nome, descrizione, durata, prezzo);
+- **orari di apertura** per giorno della settimana;
+- finestra di prenotazione e passo degli slot.
 
-## Deploy on Vercel
+## Struttura
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/
+  page.tsx              Home
+  prenota/              Pagina e form di prenotazione (client)
+  admin/                Login + dashboard barbiere
+actions/                Server Action (booking, auth, admin)
+lib/
+  shop.ts               Configurazione negozio, servizi, orari
+  availability.ts       Calcolo degli slot disponibili
+  time.ts               Date/orari nel fuso del negozio
+  auth.ts               Sessione firmata (Web Crypto)
+  prisma.ts             Client del database
+prisma/schema.prisma    Modelli Appointment e Block
+proxy.ts                Protezione area /admin (ex middleware)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Comandi utili
+
+```bash
+npm run dev        # sviluppo
+npm run build      # build di produzione
+npm run start      # avvia la build
+npx prisma studio  # interfaccia visuale al database
+```
