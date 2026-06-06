@@ -2,7 +2,9 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LogoMark } from "@/components/LogoMark";
-import { Reveal } from "@/components/Reveal";
+import { Reveal, Stagger, Item } from "@/components/Reveal";
+import { ScrollProgress } from "@/components/motion/ScrollProgress";
+import { Parallax } from "@/components/motion/Parallax";
 import {
   getShop,
   getServices,
@@ -41,40 +43,50 @@ export default async function HomePage() {
 
   return (
     <>
+      <ScrollProgress />
       <SiteHeader />
 
       {/* ───────────────── HERO ───────────────── */}
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-[1400px] items-center gap-12 px-6 py-20 sm:py-24 lg:grid-cols-[1.45fr_1fr] lg:gap-20 lg:py-28">
-          <Reveal>
-            <p className="eyebrow">{shop.tagline} — {city}</p>
-            <h1 className="mt-6 font-display font-semibold leading-[0.95] tracking-tight text-ink text-[clamp(3rem,8vw,7rem)]">
-              L&apos;arte del taglio,
-              <br />
-              <span className="italic text-muted">curata nel dettaglio.</span>
-            </h1>
-            <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
-              Taglio, barba e rasatura tradizionale nel cuore di {city}.
-              Prenota il tuo momento, al resto pensiamo noi.
-            </p>
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link
-                href="/prenota"
-                className="signage rounded-sm bg-ink px-8 py-4 text-sm text-bg transition-colors hover:bg-gold-soft"
-              >
-                Prenota ora
-              </Link>
-              <a
-                href={`tel:${shop.phone.replace(/\s/g, "")}`}
-                className="signage rounded-sm border border-line-strong px-8 py-4 text-sm text-ink transition-colors hover:border-ink"
-              >
-                Chiama
-              </a>
-            </div>
-          </Reveal>
+          <Stagger>
+            <Item>
+              <p className="eyebrow">{shop.tagline} — {city}</p>
+            </Item>
+            <Item>
+              <h1 className="mt-6 font-display font-semibold leading-[0.95] tracking-tight text-ink text-[clamp(3rem,8vw,7rem)]">
+                L&apos;arte del taglio,
+                <br />
+                <span className="italic text-muted">curata nel dettaglio.</span>
+              </h1>
+            </Item>
+            <Item>
+              <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
+                Taglio, barba e rasatura tradizionale nel cuore di {city}.
+                Prenota il tuo momento, al resto pensiamo noi.
+              </p>
+            </Item>
+            <Item>
+              <div className="mt-10 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/prenota"
+                  className="signage rounded-sm bg-ink px-8 py-4 text-sm text-bg transition-colors hover:bg-gold-soft"
+                >
+                  Prenota ora
+                </Link>
+                <a
+                  href={`tel:${shop.phone.replace(/\s/g, "")}`}
+                  className="signage rounded-sm border border-line-strong px-8 py-4 text-sm text-ink transition-colors hover:border-ink"
+                >
+                  Chiama
+                </a>
+              </div>
+            </Item>
+          </Stagger>
 
           {/* Pannello informazioni (sostituisce il disco) */}
-          <Reveal delay={120}>
+          <Parallax strength={26}>
+            <Reveal delay={150}>
             <div className="rounded-2xl border border-line bg-gradient-to-b from-surface to-black p-8">
               <div className="flex items-center gap-3 border-b border-line/70 pb-6">
                 <LogoMark className="h-10 w-10 text-ink" />
@@ -115,7 +127,24 @@ export default async function HomePage() {
                 Apri in mappa
               </a>
             </div>
-          </Reveal>
+            </Reveal>
+          </Parallax>
+        </div>
+
+        {/* Indicatore "scorri" */}
+        <div className="pointer-events-none flex justify-center pb-2">
+          <svg
+            className="scroll-cue h-5 w-5 text-faint"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
         </div>
 
         {/* Striscia scorrevole */}
@@ -157,7 +186,7 @@ export default async function HomePage() {
             <Reveal key={s.id} delay={i * 70}>
               <Link
                 href={`/prenota?servizio=${s.id}`}
-                className="group flex h-full flex-col justify-between rounded-xl border border-line bg-surface p-7 transition-colors hover:border-line-strong"
+                className="lift group flex h-full flex-col justify-between rounded-xl border border-line bg-surface p-7 hover:border-line-strong"
               >
                 <div>
                   <div className="flex items-start justify-between gap-4">
@@ -173,7 +202,7 @@ export default async function HomePage() {
                 <div className="mt-8 flex items-center justify-between border-t border-line/70 pt-4">
                   <span className="eyebrow">{s.durationMin} min</span>
                   <span className="signage text-[12px] text-muted transition-colors group-hover:text-ink">
-                    Prenota →
+                    Prenota <span className="arrow-slide">→</span>
                   </span>
                 </div>
               </Link>
@@ -223,7 +252,7 @@ export default async function HomePage() {
             },
           ].map((step, i) => (
             <Reveal key={step.t} delay={i * 90}>
-              <div className="h-full rounded-xl border border-line bg-surface p-8">
+              <div className="lift h-full rounded-xl border border-line bg-surface p-8">
                 <div className="flex items-center gap-4">
                   <span className="grid h-11 w-11 place-items-center rounded-sm border border-line-strong text-ink">
                     {step.icon}

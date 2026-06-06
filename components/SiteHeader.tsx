@@ -19,7 +19,7 @@ export async function SiteHeader() {
             <Link
               key={l.href}
               href={l.href}
-              className="signage text-[13px] text-muted transition-colors hover:text-ink"
+              className="link-underline signage text-[13px] text-muted transition-colors hover:text-ink"
             >
               {l.label}
             </Link>

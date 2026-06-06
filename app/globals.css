@@ -113,6 +113,56 @@ body::after {
   background: linear-gradient(90deg, var(--color-line-strong), transparent);
 }
 
+/* Card che si solleva all'hover */
+.lift {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    background-color 0.35s ease;
+}
+.lift:hover {
+  transform: translateY(-5px);
+}
+
+/* Sottolineatura animata dei link di menu */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Indicatore "scorri" nell'hero */
+.scroll-cue {
+  animation: cue 1.8s ease-in-out infinite;
+}
+@keyframes cue {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+/* Freccia che scorre dentro i pulsanti/card al hover */
+.arrow-slide {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .arrow-slide {
+  transform: translateX(4px);
+}
+
 /* Striscia scorrevole (marquee) */
 .marquee {
   overflow: hidden;

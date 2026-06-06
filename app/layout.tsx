@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Oswald, Playfair_Display } from "next/font/google";
 import { getShop } from "@/lib/shop";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -50,7 +51,9 @@ export default function RootLayout({
       lang="it"
       className={`${inter.variable} ${oswald.variable} ${playfair.variable} h-full`}
     >
-      <body className="min-h-full flex flex-col antialiased">{children}</body>
+      <body className="min-h-full flex flex-col antialiased">
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }
