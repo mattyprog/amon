@@ -22,10 +22,10 @@ export type ShopInfo = {
 export const SHOP_DEFAULTS: ShopInfo = {
   name: "Amon",
   tagline: "Barberia",
-  claim: "Taglio, barba e cura. Su misura per te.",
+  claim: "Ogni dettaglio conta.",
   phone: "+39 351 000 0000",
-  email: "info@amonbarber.it",
-  address: "Via del Taglio 12, Milano",
+  email: "info@amonbarberia.it",
+  address: "Via Ponte Nuovo 26, Fondi",
   instagram: "https://www.instagram.com/amon.barberia",
   instagramHandle: "@amon.barberia",
 };
@@ -75,13 +75,13 @@ export const DEFAULT_SERVICES: Omit<Service, "id">[] = [
 const H = (h: number, m = 0) => h * 60 + m;
 
 export const DEFAULT_HOURS: Record<number, Array<[number, number]>> = {
-  0: [],
-  1: [],
-  2: [[H(9), H(13)], [H(15), H(19)]],
-  3: [[H(9), H(13)], [H(15), H(19)]],
-  4: [[H(9), H(13)], [H(15), H(19)]],
-  5: [[H(9), H(13)], [H(15), H(20)]],
-  6: [[H(9), H(18)]],
+  0: [], // Domenica — chiuso
+  1: [], // Lunedì — chiuso
+  2: [[H(9), H(19)]], // Martedì
+  3: [[H(9), H(19)]], // Mercoledì
+  4: [[H(9), H(19)]], // Giovedì
+  5: [[H(9), H(19)]], // Venerdì
+  6: [[H(9), H(19)]], // Sabato
 };
 
 export const weekdayNames = [

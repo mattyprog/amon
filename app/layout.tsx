@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Oswald } from "next/font/google";
+import { Inter, Oswald, Playfair_Display } from "next/font/google";
 import { getShop } from "@/lib/shop";
 import "./globals.css";
 
@@ -16,6 +16,14 @@ const oswald = Oswald({
   display: "swap",
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
 export async function generateMetadata(): Promise<Metadata> {
   const shop = await getShop();
   const city = shop.address.split(",").slice(-1)[0].trim();
@@ -29,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#08080a",
+  themeColor: "#0a0a0b",
   width: "device-width",
   initialScale: 1,
 };
@@ -38,7 +46,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="it" className={`${inter.variable} ${oswald.variable} h-full`}>
+    <html
+      lang="it"
+      className={`${inter.variable} ${oswald.variable} ${playfair.variable} h-full`}
+    >
       <body className="min-h-full flex flex-col antialiased">{children}</body>
     </html>
   );

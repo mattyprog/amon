@@ -11,6 +11,9 @@ import {
 import { upcomingDates, weekdayOf, formatDateShort } from "@/lib/time";
 import { BookingForm, type DayOption } from "./BookingForm";
 
+// Dipende dai dati gestiti dal barbiere (servizi, orari): sempre dinamica.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const shop = await getShop();
   return {
@@ -42,18 +45,19 @@ export default async function BookingPage({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-3xl px-5 py-14">
+      <main className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-6">
         <Link
           href="/"
-          className="text-sm text-muted underline-offset-4 hover:text-ink hover:underline"
+          className="signage text-[13px] text-muted underline-offset-8 hover:text-ink hover:underline"
         >
-          ← Torna alla home
+          ← Home
         </Link>
-        <h1 className="mt-4 font-display text-4xl text-ink sm:text-5xl">
-          Prenota il tuo appuntamento
+        <p className="eyebrow mt-6">Prenotazione</p>
+        <h1 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
+          Il tuo appuntamento
         </h1>
         <p className="mt-3 text-muted">
-          Scegli il servizio, il giorno e l&apos;orario. Conferma immediata.
+          Servizio, giorno e orario. Conferma immediata, nessuna attesa.
         </p>
 
         <div className="mt-10">

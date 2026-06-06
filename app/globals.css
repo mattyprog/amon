@@ -1,66 +1,146 @@
 @import "tailwindcss";
 
-/* Tema Amon Barberia — monocromatico: nero profondo, bianco netto, grigi.
-   I nomi "gold/gold-soft" sono mantenuti come "accento" del tema ma ora
-   puntano al bianco del logo, così l'intera UI resta in bianco e nero. */
+/* ===========================================================================
+   Amon Barberia — sistema di design
+   Monocromatico (nero/bianco), editoriale-premium. "Ogni dettaglio conta."
+   =========================================================================== */
 @theme {
-  --color-bg: #08080a;
-  --color-surface: #121214;
-  --color-surface-2: #1a1a1d;
-  --color-line: #2a2a2e;
-  --color-ink: #f6f6f7;
-  --color-muted: #8d8d94;
+  /* Neutri a livelli per dare profondità senza colore */
+  --color-bg: #0a0a0b;
+  --color-surface: #111113;
+  --color-surface-2: #17171a;
+  --color-line: #262629;
+  --color-line-strong: #3a3a3f;
+  --color-ink: #f6f6f5;
+  --color-muted: #9b9ba2;
+  --color-faint: #6c6c73;
+  /* "gold" mantenuto come nome dell'accento, ma è bianco (brand B/N) */
   --color-gold: #ffffff;
-  --color-gold-soft: #d4d4d8;
+  --color-gold-soft: #d6d6d8;
   --color-danger: #e0664f;
-  --color-success: #65b06a;
+  --color-success: #6bb274;
 
-  --font-display: var(--font-oswald), Georgia, serif;
+  /* Tre ruoli tipografici */
+  --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-condensed: var(--font-oswald), "Arial Narrow", sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--color-bg);
   color: var(--color-ink);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Sottile bagliore per dare profondità allo sfondo scuro. */
+/* Sfondo: bagliore tenue + grana sottile per atmosfera "premium" */
 body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(70rem 45rem at 50% -15%, rgba(255, 255, 255, 0.06), transparent 60%),
+    radial-gradient(55rem 55rem at 100% 110%, rgba(255, 255, 255, 0.03), transparent 60%);
+}
+body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(60rem 40rem at 50% -10%, rgba(255, 255, 255, 0.07), transparent 60%),
-    radial-gradient(50rem 50rem at 100% 100%, rgba(255, 255, 255, 0.035), transparent 60%);
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* Display serif: titoli editoriali */
 .font-display {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-display);
 }
 
-/* Titoli da insegna: maiuscolo spaziato. */
+/* Insegna: Oswald maiuscolo spaziato (DNA barbershop) */
 .signage {
-  font-family: var(--font-display), serif;
+  font-family: var(--font-condensed);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+}
+
+/* Occhiello sopra i titoli */
+.eyebrow {
+  font-family: var(--font-condensed);
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: 0.72rem;
+  color: var(--color-muted);
 }
 
 ::selection {
-  background: var(--color-gold);
+  background: var(--color-ink);
   color: var(--color-bg);
 }
 
-/* Focus ring coerente e accessibile su tutta l'interfaccia. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-gold);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
   border-radius: 2px;
+}
+
+/* Reveal allo scroll (attivato da <Reveal>) */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Linea che “cresce” come dettaglio decorativo */
+.rule-grow {
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-line-strong), transparent);
+}
+
+/* Striscia scorrevole (marquee) */
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee__track {
+  display: inline-flex;
+  gap: 3rem;
+  padding-right: 3rem;
+  animation: marquee 28s linear infinite;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }
