@@ -8,7 +8,7 @@ export async function SiteHeader() {
   const shop = await getShop();
   return (
     <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-6">
         <Logo />
         <nav className="hidden items-center gap-9 md:flex">
           {[

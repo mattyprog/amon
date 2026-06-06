@@ -15,7 +15,7 @@ export async function SiteFooter() {
   const order = [1, 2, 3, 4, 5, 6, 0];
   return (
     <footer className="mt-auto border-t border-line/70 bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:px-6 sm:grid-cols-3">
+      <div className="mx-auto grid max-w-[1400px] gap-12 px-6 py-16 sm:grid-cols-3">
         <div>
           <div className="flex items-center gap-3">
             <LogoMark className="h-9 w-9 text-ink" />
