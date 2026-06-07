@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { Logo } from "./Logo";
 import { InstagramIcon } from "./InstagramIcon";
 import { getShop } from "@/lib/shop";

@@ -113,6 +113,28 @@ body::after {
   background: linear-gradient(90deg, var(--color-line-strong), transparent);
 }
 
+/* ── Transizioni tra pagine (View Transitions API) ──
+   La pagina vecchia sfuma, la nuova entra in dissolvenza + leggera salita.
+   Su browser non supportati la navigazione resta normale (nessuna animazione). */
+@keyframes vt-old {
+  to { opacity: 0; }
+}
+@keyframes vt-new {
+  from { opacity: 0; transform: translateY(16px); }
+}
+::view-transition-old(root) {
+  animation: vt-old 0.3s cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(root) {
+  animation: vt-new 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
 /* Card che si solleva all'hover */
 .lift {
   transition:

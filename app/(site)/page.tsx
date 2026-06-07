@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { LogoMark } from "@/components/LogoMark";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
 import { Parallax } from "@/components/motion/Parallax";

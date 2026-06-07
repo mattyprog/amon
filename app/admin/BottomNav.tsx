@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { usePathname } from "next/navigation";
 
 /** Barra di navigazione in basso, stile app: Agenda e Impostazioni. */

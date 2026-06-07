@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { getShop, SHOP_FIELDS } from "@/lib/shop";
 import { ensureSeeded } from "@/lib/seed";
 import { ShopForm, type Field } from "./ShopForm";
