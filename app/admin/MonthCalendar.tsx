@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransitionRouter as useRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import {
   monthGrid,
   monthLabel,

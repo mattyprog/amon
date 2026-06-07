@@ -1,4 +1,4 @@
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { getOpeningHours, weekdayNames } from "@/lib/shop";
 import { ensureSeeded } from "@/lib/seed";
 import { minutesToHHMM } from "@/lib/time";

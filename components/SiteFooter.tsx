@@ -1,4 +1,4 @@
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { getShop, getOpeningHours, weekdayNames } from "@/lib/shop";
 import { minutesToHHMM } from "@/lib/time";
 import { InstagramIcon } from "./InstagramIcon";

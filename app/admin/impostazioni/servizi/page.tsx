@@ -1,4 +1,4 @@
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { getServices } from "@/lib/shop";
 import { ensureSeeded } from "@/lib/seed";
 import { ServicesManager } from "./ServicesManager";

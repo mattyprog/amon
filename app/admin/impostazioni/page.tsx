@@ -1,4 +1,4 @@
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { logout } from "@/actions/auth";
 import { getCurrentUser } from "@/lib/session";
 import { ensureSeeded } from "@/lib/seed";

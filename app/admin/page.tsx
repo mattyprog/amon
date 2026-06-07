@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/actions/auth";
 import { cancelAppointment, removeBlock } from "@/actions/admin";
