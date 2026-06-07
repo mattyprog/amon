@@ -118,7 +118,8 @@ export async function deleteService(formData: FormData): Promise<void> {
   await requireSession();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
-  await prisma.service.delete({ where: { id } });
+  // deleteMany non lancia eccezioni se l'id non esiste.
+  await prisma.service.deleteMany({ where: { id } });
   revalidatePath("/admin/impostazioni/servizi");
   revalidatePath("/");
   revalidatePath("/prenota");

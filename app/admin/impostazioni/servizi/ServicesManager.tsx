@@ -12,10 +12,8 @@ function ServiceForm({ service }: { service?: Service }) {
   const [state, action, pending] = useActionState(saveService, {});
   const isNew = !service;
   return (
-    <form
-      action={action}
-      className="rounded-xl border border-line bg-surface p-4"
-    >
+    <div className="rounded-xl border border-line bg-surface p-4">
+      <form action={action}>
       {service && <input type="hidden" name="id" value={service.id} />}
       <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
         <label className="block">
@@ -72,7 +70,7 @@ function ServiceForm({ service }: { service?: Service }) {
         <p className="mt-2 text-sm text-success">Salvato.</p>
       )}
 
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-3">
         <button
           type="submit"
           disabled={pending}
@@ -80,25 +78,22 @@ function ServiceForm({ service }: { service?: Service }) {
         >
           {pending ? "Salvo…" : isNew ? "Aggiungi servizio" : "Salva"}
         </button>
-        {service && (
-          <DeleteService id={service.id} name={service.name} />
-        )}
       </div>
-    </form>
-  );
-}
+      </form>
 
-function DeleteService({ id, name }: { id: string; name: string }) {
-  return (
-    <form action={deleteService}>
-      <input type="hidden" name="id" value={id} />
-      <ConfirmButton
-        confirm={`Eliminare il servizio "${name}"?`}
-        className="rounded-md border border-line px-4 py-2 text-sm text-muted hover:border-danger hover:text-danger"
-      >
-        Elimina
-      </ConfirmButton>
-    </form>
+      {/* Form separato (non annidato) per l'eliminazione */}
+      {service && (
+        <form action={deleteService} className="mt-3 border-t border-line/70 pt-3">
+          <input type="hidden" name="id" value={service.id} />
+          <ConfirmButton
+            confirm={`Eliminare il servizio "${service.name}"?`}
+            className="text-sm text-muted transition-colors hover:text-danger"
+          >
+            Elimina servizio
+          </ConfirmButton>
+        </form>
+      )}
+    </div>
   );
 }
 
