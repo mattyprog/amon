@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import {
   getServices,
   getShop,
@@ -43,9 +41,7 @@ export default async function BookingPage({
     services.find((s) => s.id === servizio)?.id ?? services[0].id;
 
   return (
-    <>
-      <SiteHeader />
-      <main className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-6">
+    <main className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-6">
         <Link
           href="/"
           className="signage text-[13px] text-muted underline-offset-8 hover:text-ink hover:underline"
@@ -67,8 +63,6 @@ export default async function BookingPage({
             initialServiceId={initialService}
           />
         </div>
-      </main>
-      <SiteFooter />
-    </>
+    </main>
   );
 }

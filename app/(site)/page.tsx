@@ -1,9 +1,6 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import { LogoMark } from "@/components/LogoMark";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
-import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { Parallax } from "@/components/motion/Parallax";
 import {
   getShop,
@@ -43,9 +40,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <ScrollProgress />
-      <SiteHeader />
-
       {/* ───────────────── HERO ───────────────── */}
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-[1400px] items-center gap-12 px-6 py-20 sm:py-24 lg:grid-cols-[1.45fr_1fr] lg:gap-20 lg:py-28">
@@ -347,8 +341,6 @@ export default async function HomePage() {
           </Link>
         </Reveal>
       </section>
-
-      <SiteFooter />
     </>
   );
 }
