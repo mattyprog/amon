@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LogoMark } from "@/components/LogoMark";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
 import { Parallax } from "@/components/motion/Parallax";
+import { HeroShift } from "@/components/motion/HeroShift";
 import {
   getShop,
   getServices,
@@ -42,6 +43,7 @@ export default async function HomePage() {
     <>
       {/* ───────────────── HERO ───────────────── */}
       <section className="relative overflow-hidden">
+        <HeroShift>
         <div className="mx-auto grid max-w-[1400px] items-center gap-12 px-6 py-20 sm:py-24 lg:grid-cols-[1.45fr_1fr] lg:gap-20 lg:py-28">
           <Stagger>
             <Item>
@@ -124,21 +126,24 @@ export default async function HomePage() {
             </Reveal>
           </Parallax>
         </div>
+        </HeroShift>
 
-        {/* Indicatore "scorri" */}
-        <div className="pointer-events-none flex justify-center pb-2">
-          <svg
-            className="scroll-cue h-5 w-5 text-faint"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
+        {/* Indicatore "scorri" (cliccabile) */}
+        <div className="flex justify-center pb-2">
+          <a href="#servizi" aria-label="Scorri ai servizi" className="p-2">
+            <svg
+              className="scroll-cue h-5 w-5 text-faint"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </a>
         </div>
 
         {/* Striscia scorrevole */}
